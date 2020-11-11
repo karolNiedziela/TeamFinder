@@ -13,7 +13,7 @@ namespace BackEnd.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SessionsController : ControllerBase
+    public class SessionsController : Controller
     {
         private readonly ApplicationDbContext _context;
 
@@ -39,6 +39,7 @@ namespace BackEnd.Controllers
         {
             var session = await _context.Sessions.Include(s => s.SessionPlayers)
                                                         .ThenInclude(sp => sp.Player)
+                                                 .Include(s => s.Game)
                                                  .SingleOrDefaultAsync(s => s.Id == id);
 
             if (session == null)
@@ -119,6 +120,22 @@ namespace BackEnd.Controllers
             await _context.SaveChangesAsync();
 
             return session;
+        }
+
+        [HttpPost("upload")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Upload(IFormFile file)
+        {
+            var loader = new SessionLoader();
+
+            using (var stream = file.OpenReadStream())
+            {
+                await loader.LoadDataAsync(stream, _context);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
         }
 
         private bool SessionExists(int id)

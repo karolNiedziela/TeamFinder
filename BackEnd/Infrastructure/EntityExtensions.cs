@@ -14,8 +14,8 @@ namespace BackEnd.Infrastructure
             {
                 Id = session.Id,
                 Title = session.Title,
-                StartTime = session.StartTime,
-                EndTime = session.EndTime,
+                StartTime = session.StartTime?.LocalDateTime,
+                EndTime = session.EndTime?.LocalDateTime,
                 Players = session.SessionPlayers?
                                   .Select(sp => new PlayerDTO
                                   {

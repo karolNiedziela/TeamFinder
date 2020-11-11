@@ -1,0 +1,23 @@
+﻿@page "{id}"
+@model FrontEnd.PlayerModel
+
+<ol class="breadcrumb">
+    <li class="breadcrumb-item"><a asp-page="/Players">Players</a></li>
+    <li class="breadcrumb-item active">@Model.Player.UserName</li>
+</ol>
+
+<h2>@Model.Player.UserName</h2>
+
+<p>@Model.Player.Info</p>
+
+<h3>Games</h3>
+<div class="row">
+    <div class="col-md-5">
+        <ul class="list-group">
+            @foreach (var game in Model.Player.Games)
+            {
+                <li class="list-group-item"><a asp-page="Game" asp-route-id="game.Id">@game.Name</a></li>
+            }
+        </ul>
+    </div>
+</div>

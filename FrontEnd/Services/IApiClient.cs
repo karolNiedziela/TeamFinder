@@ -11,10 +11,14 @@ namespace FrontEnd.Services
         Task<List<SessionResponse>> GetSessionsAsync();
         Task<SessionResponse> GetSessionAsync(int id);
         Task<List<PlayerResponse>> GetPlayersAsync();
-        Task<PlayerResponse> GetPlayerAsync(string username);
-        Task<List<PlayerResponse>> GetPlayerGamesAsync(string username);
-        Task<List<SessionResponse>> GetPlayerSessionsAsync(string username);
+        Task<PlayerResponse> GetPlayerAsync(int id);
+        Task<List<PlayerResponse>> GetPlayerGamesAsync(int id);
+        Task<List<SessionResponse>> GetPlayerSessionsAsync(int id);
         Task<List<GameDTO>> GetGamesAsync();
         Task<GameDTO> GetGameAsync(string name);
+        Task<SessionResponse> PostSession(SessionDTO session);
+        Task<List<SearchResult>> SearchAsync(string query);
+        Task PutSessionAsync(SessionDTO session);
+        Task DeleteSessionAsync(int id);
     }
 }

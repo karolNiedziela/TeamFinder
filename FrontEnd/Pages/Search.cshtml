@@ -1,0 +1,65 @@
+﻿@page
+@model FrontEnd.Pages.SearchModel
+
+<div class="search">
+    <h1>Search</h1>
+    <form method="get">
+        <div class="input-group mb-3">
+            <input asp-for="Term" placeholder="Search for sessions or players..." class="form-control" />
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </div>
+        </div> 
+        @if (Model.SearchResults?.Count > 0)
+        {
+            <p>
+                @Model.SearchResults.Count result(s)
+            </p>
+        }
+    </form>
+</div>
+
+<div class="row">
+    @foreach(var result in Model.SearchResults)
+    {
+        <div class="col-md-12">
+            @switch (result.Type)
+                {
+                    case TeamFinderDTO.SearchResultType.Player:
+                        <div class="card shadow mb-3">
+                            <h3 class="card-title">Player: <a asp-page="Player" asp-route-id="@result.Player.Id">@result.Player.UserName</a></h3>
+
+
+                            <h4>Session:</h4>
+                            @foreach (var session in result.Player.SessionResponses)
+                            {
+                                <a asp-page="Session" asp-route-id="@session.Id"><em>@session.Title</em></a>
+                            }
+                            <div class="card-body">
+                                <p>
+                                    <h4>Player details:</h4>
+                                    <ul class="list-unstyled">
+                                        <li>@result.Player.Age</li>
+                                        <li>@result.Player.Info</li>
+                                    </ul>
+                                </p>
+                            </div>
+                        </div>
+                    break;
+
+                    case TeamFinderDTO.SearchResultType.Session:
+                        <div class="card shadow mb-3">
+                            <h3 class="card-title">Session: <a asp-page="Session" asp-route-id="@result.Session.Id">@result.Session.Title</a></h3>
+                            <div class="card-body">
+                                <h4>Player(s)</h4>
+                                @foreach (var player in result.Session.Players)
+                                {
+                                    <a asp-page="Player" asp-route-id="@player.Id"><em>@player.UserName</em></a>
+                                }
+                            </div>
+                        </div>
+                    break;
+                }
+        </div>
+    }
+</div>

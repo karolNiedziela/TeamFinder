@@ -20,23 +20,19 @@ namespace BackEnd.Services
 
         public async Task SeedAsync()
         {
-            using (var serviceScope = _scopeFactory.CreateScope())
+            using var serviceScope = _scopeFactory.CreateScope();
+            using var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
+            var games = await context.Games.ToListAsync();
+            if (games.Count != 0)
             {
-                using (var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
-                {
-                    var games = await context.Games.ToListAsync();
-                    if (games.Count != 0)
-                    {
-                        return;
-                    }
-                    var details = await GamesScrapper.GetPageDetails("https://newzoo.com/insights/rankings/top-20-core-pc-games/");
-                    var result = GamesScrapper.AssignData(details);
+                return;
+            }
+            var details = await GamesScrapper.GetPageDetails("https://newzoo.com/insights/rankings/top-20-core-pc-games/");
+            var result = GamesScrapper.AssignData(details);
 
-                    await context.Games.AddRangeAsync(result);
+            await context.Games.AddRangeAsync(result);
 
-                    await context.SaveChangesAsync();
-                }
-            }    
+            await context.SaveChangesAsync();
         }
     }
 }
