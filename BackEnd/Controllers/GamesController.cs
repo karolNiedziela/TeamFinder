@@ -32,10 +32,10 @@ namespace BackEnd.Controllers
             return games;
         }
 
-        [HttpGet("{name}")]
-        public async Task<ActionResult<GameDTO>> GetAsync(string name)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<GameDTO>> GetAsync(int id)
         {
-            var game = await _context.Games.SingleOrDefaultAsync(g => g.Name == name);
+            var game = await _context.Games.SingleOrDefaultAsync(g => g.Id == id);
 
             if (game == null)
             {

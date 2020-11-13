@@ -28,6 +28,15 @@ namespace System.Security.Claims
 
         public static void MakeAdmin(this ClaimsIdentity identity) =>
             identity.AddClaim(new Claim(AuthConstants.IsAdmin, AuthConstants.TrueValue));
+
+        public static bool IsPlayer(this ClaimsPrincipal principal) =>
+            principal.HasClaim(AuthConstants.IsPlayer, AuthConstants.TrueValue);
+
+        public static void MakePlayer(this ClaimsPrincipal principal) =>
+            principal.Identities.First().MakePlayer();
+
+        public static void MakePlayer(this ClaimsIdentity identity) =>
+            identity.AddClaim(new Claim(AuthConstants.IsPlayer, AuthConstants.TrueValue));
     }
 }
 
@@ -37,5 +46,8 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static AuthorizationPolicyBuilder RequireIsAdminClaim(this AuthorizationPolicyBuilder builder) =>
             builder.RequireClaim(AuthConstants.IsAdmin, AuthConstants.TrueValue);
+
+        public static AuthorizationPolicyBuilder RequireIsPlayerClaim(this AuthorizationPolicyBuilder builder) =>
+            builder.RequireClaim(AuthConstants.IsPlayer, AuthConstants.TrueValue);
     }
 }

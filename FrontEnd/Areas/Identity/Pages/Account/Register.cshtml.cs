@@ -50,6 +50,12 @@ namespace FrontEnd.Areas.Identity.Pages.Account
 
         public class InputModel
         {
+
+            [Required]
+            [StringLength(100, MinimumLength = 5)]
+            [Display(Name = "Username")]
+            public virtual string UserName { get; set; }
+
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
@@ -79,7 +85,7 @@ namespace FrontEnd.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new User { UserName = Input.Email, Email = Input.Email };
+                var user = new User { UserName = Input.UserName, Email = Input.Email };
 
                 if(await _adminService.AllowAdminUserCreationAsync())
                 {

@@ -29,6 +29,14 @@ namespace FrontEnd.Areas
                 identity.MakeAdmin();
             }
 
+            var player = await _apiClient.GetPlayerAsync(user.UserName);
+
+            if (player != null)
+            {
+                identity.MakePlayer();
+                identity.AddClaim(new Claim("PlayerId", $"{player.Id}"));
+            }
+
             return identity;
         }
     }

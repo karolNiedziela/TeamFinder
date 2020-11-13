@@ -27,9 +27,7 @@
                 {
                     case TeamFinderDTO.SearchResultType.Player:
                         <div class="card shadow mb-3">
-                            <h3 class="card-title">Player: <a asp-page="Player" asp-route-id="@result.Player.Id">@result.Player.UserName</a></h3>
-
-
+                            <h3 class="card-title">Player: <a asp-page="Player" asp-route-id="@result.Player.Id">@result.Player.UserName</a></h3>        
                             <h4>Session:</h4>
                             @foreach (var session in result.Player.SessionResponses)
                             {
@@ -51,10 +49,13 @@
                         <div class="card shadow mb-3">
                             <h3 class="card-title">Session: <a asp-page="Session" asp-route-id="@result.Session.Id">@result.Session.Title</a></h3>
                             <div class="card-body">
-                                <h4>Player(s)</h4>
+                                <h4>Game: @result.Session.Game.Name</h4>
+                                <h4>Player(s):</h4>
+
                                 @foreach (var player in result.Session.Players)
                                 {
                                     <a asp-page="Player" asp-route-id="@player.Id"><em>@player.UserName</em></a>
+
                                 }
                             </div>
                         </div>

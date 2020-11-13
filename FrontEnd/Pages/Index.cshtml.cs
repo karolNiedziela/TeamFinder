@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using FrontEnd.Extensions;
 using FrontEnd.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,22 +14,32 @@ namespace FrontEnd.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly IApiClient _apiClient;
+        protected readonly IApiClient _apiClient;
 
         public IndexModel(IApiClient apiClient)
         {
             _apiClient = apiClient;
         }
 
-        public IEnumerable<IGrouping<DateTimeOffset?, SessionResponse>> Sessions { get; set; }
+        public IEnumerable<IGrouping<string, SessionResponse>> Sessions { get; set; }
 
-        public IEnumerable<(int Offset, DayOfWeek? DayofWeek)> DayOffsets { get; set; }
+        public GameDTO Game { get; set; }
 
-        public PlayerDTO Owner { get; set; }
+        public IEnumerable<(int Offset, DateTime? Date)> DayOffsets { get; set; }
+
+        public List<PlayerDTO> Owner { get; set; }
 
         public int CurrentDayOffset { get; set; }
 
         public bool IsAdmin { get; set; }
+
+        [TempData]
+        public string Message { get; set; }
+
+        public bool ShowMessage => !string.IsNullOrEmpty(Message);
+
+        public List<int> UserSessions { get; set; } = new List<int>();
+
 
         public async Task OnGet(int day = 0)
         {
@@ -36,23 +47,53 @@ namespace FrontEnd.Pages
 
             CurrentDayOffset = day;
 
-            var sessions = await _apiClient.GetSessionsAsync();
+            if (User.Identity.IsAuthenticated)
+            {
+                var userSessions = await _apiClient.GetSessionsByPlayerAsync(User.Identity.GetPlayerId());
+                UserSessions = userSessions.Select(us => us.Id).ToList();
+            }
 
-            var startDate = sessions.Min(s => s.StartTime?.Date);
+
+            var sessions = await GetSessionsAsync();
+
+            var startDate = DateTime.Today.Date;
 
             var offset = 0;
             DayOffsets = sessions.Select(s => s.StartTime?.Date)
                                  .Distinct()
+                                 .Where(s => s.Value >= DateTime.Today)
                                  .OrderBy(d => d)
-                                 .Select(day => (offset++, day?.DayOfWeek));
+                                 .Select(day => (offset++, day?.Date));
 
-            var filterDate = startDate?.AddDays(day);
+            var filterDate = startDate.AddDays(CurrentDayOffset);
 
             Sessions = sessions.Where(s => s.StartTime?.Date == filterDate)
-                               .OrderBy(s => s.GameId)
-                               .GroupBy(s => s.StartTime)
+                               .GroupBy(s => s.Game.Name)
                                .OrderBy(g => g.Key);
-            Owner = sessions.Select(s => s.Players.FirstOrDefault()).FirstOrDefault();
+
+            Owner = sessions.Select(s => s?.Players).FirstOrDefault();
+
+            var gameId = sessions.Select(s => s.Game.Id);
+            Game = await _apiClient.GetGameAsync(gameId.FirstOrDefault());
+        }
+
+        protected virtual Task<List<SessionResponse>> GetSessionsAsync()
+        {
+            return _apiClient.GetSessionsAsync();
+        }
+
+        public async Task<IActionResult> OnPostAsync(int sessionId)
+        {
+            await _apiClient.AddSessionToPlayerAsync(User.Identity.GetPlayerId(), sessionId);
+
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(int sessionId)
+        {
+            await _apiClient.RemoveSessionFromPlayerAsync(User.Identity.GetPlayerId(), sessionId);
+
+            return RedirectToPage();
         }
     }
 }

@@ -1,0 +1,49 @@
+﻿@page
+@model FrontEnd.Pages.WelcomeModel
+
+
+<h2>Welcome @User.Identity.Name</h2>
+<p>
+    Register as an player to get access to stuff.
+</p>
+
+<form method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <input asp-for="Player.UserName" value="@User.Identity.Name" type="hidden"/>
+    <div class="form-group">
+        <label asp-for="Player.UserName" class="control-label"></label>
+        <div class="row">
+            <div class="col-md-6">
+                <input asp-for="Player.UserName" class="form-control" value="@User.Identity.Name" readonly />
+            </div>
+        </div>
+        <span asp-validation-for="Player.UserName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Player.Age" class="control-label"></label>
+        <div class="row">
+            <div class="col-md-6">
+                <input asp-for="Player.Age" class="form-control" />
+            </div>
+        </div>
+        <span asp-validation-for="Player.Age" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Player.Info" class="control-label"></label>
+        <div class="row">
+            <div class="col-md-6">
+                <textarea asp-for="Player.Info" class="form-control" rows="3"></textarea>
+            </div>
+        </div>
+        <span asp-validation-for="Player.Info" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <div class="">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,38 @@
+﻿@model IndexModel
+
+<ul class="nav nav-pills mb-3">
+    @foreach (var day in Model.DayOffsets)
+    {
+        <li role="presentation" class="nav-item">
+            <a class="nav-link @(Model.CurrentDayOffset == day.Offset ? "active" : null)" asp-route-day="@day.Offset">@day.Date?.ToShortDateString()</a>
+        </li>
+    }
+</ul>
+
+<div class="agenda">
+    @foreach (var timeSlot in Model.Sessions)
+    {
+        <h4>@timeSlot.Key</h4>
+        <div class="row">
+            @foreach (var session in timeSlot)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow session h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><a asp-page="Session" asp-route-id="@session.Id">@session.Title</a></h5>
+                        </div>
+                        <div class="card-footer">
+                            <ul class="list-inline mb-0">
+                                @foreach (var player in session.Players)
+                                {
+                                    <li class="list-inline-item"><a asp-page="Player" asp-route-id="@player.Id">@player.UserName</a></li>
+                                }
+                            </ul>
+                            <a authorization-policy="Admin" asp-page="/Admin/EditSession" asp-route-id="@session.Id" class="btn btn-default btn-xs">Edit</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

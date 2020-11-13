@@ -11,13 +11,13 @@ namespace TeamFinderDTO
 
         [Required]
         [StringLength(100, MinimumLength = 5)]
-        public string UserName { get; set; }
+        public virtual string UserName { get; set; }
 
         [Required]
-        public int Age { get; set; }
+        public virtual int Age { get; set; }
 
         [Required]
         [StringLength(4000)]
-        public string Info { get; set; }
+        public virtual string Info { get; set; }
     }
 }

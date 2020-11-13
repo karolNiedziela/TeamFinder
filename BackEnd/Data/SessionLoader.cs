@@ -25,7 +25,10 @@ namespace BackEnd.Data
                     var thisSession = new Session { Title = session.Title, StartTime = session.StartTime, EndTime = session.EndTime, GameId = session.GameId };
                     context.Sessions.Add(thisSession);
                     addedSessions.Add(thisSession.Title, thisSession);
+                    
                 }
+
+                
 
             }
         }

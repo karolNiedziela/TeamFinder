@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FrontEnd.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using TeamFinderDTO;
 
 namespace FrontEnd.Pages.Admin
@@ -21,8 +22,18 @@ namespace FrontEnd.Pages.Admin
         [BindProperty]
         public SessionDTO Session { get; set; }
 
+        [BindProperty]
+        public int SelectedGameId { get; set; }
 
-        public async Task OnGetAsync(int id)
+        public List<SelectListItem> GamesSelectList { get; set; }
+
+        [TempData]
+        public string Message { get; set; }
+
+        public bool ShowMessage => !string.IsNullOrEmpty(Message);
+
+
+        public async Task<IActionResult> OnGetAsync(int id)
         {
             var session = await _apiClient.GetSessionAsync(id);
 
@@ -34,6 +45,12 @@ namespace FrontEnd.Pages.Admin
                 EndTime = session.EndTime,
                 GameId = session.GameId
             };
+
+            await PopulateGamesDropDownList();
+
+            SelectedGameId = session.GameId;
+
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -43,9 +60,11 @@ namespace FrontEnd.Pages.Admin
                 return Page();
             }
 
+            Message = "Session updated successfully";
+
             await _apiClient.PutSessionAsync(Session);
 
-            return Page();
+            return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostDeleteAsync(int id)
@@ -57,7 +76,21 @@ namespace FrontEnd.Pages.Admin
                 await _apiClient.DeleteSessionAsync(id);
             }
 
-            return Page();
+            Message = "Session deleted successfully";
+
+            return RedirectToPage("/Index");
+        }
+
+        public async Task PopulateGamesDropDownList()
+        {
+            var games = await _apiClient.GetGamesAsync();
+
+            GamesSelectList = games.Select(g => new SelectListItem
+            {
+                Value = g.Id.ToString(),
+                Text = g.Name
+            })
+            .ToList();
         }
     }
 }

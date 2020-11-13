@@ -27,20 +27,18 @@ namespace FrontEnd.Services
             }
             else
             {
-                using (var scope = _serviceProvider.CreateScope())
+                using var scope = _serviceProvider.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<TeamFinderIdentityDB>();
+
+                if (await context.Users.AnyAsync(u => u.IsAdmin))
                 {
-                    var context = scope.ServiceProvider.GetRequiredService<TeamFinderIdentityDB>();
-
-                    if (await context.Users.AnyAsync(u => u.IsAdmin))
-                    {
-                        _adminExists = true;
-                        return false;
-                    }
-
-                    return true;
+                    _adminExists = true;
+                    return false;
                 }
-               
-              
+
+                return true;
+
+
             }
         }
     }

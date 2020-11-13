@@ -27,6 +27,7 @@ namespace BackEnd.Controllers
         {
             var sessions = await _context.Sessions.Include(s => s.SessionPlayers)
                                                         .ThenInclude(sp => sp.Player)
+                                                  .Include(s => s.Game)
                                                   .Select(s => s.MapSessionResponse())
                                                   .ToListAsync();
 
@@ -87,16 +88,29 @@ namespace BackEnd.Controllers
         // POST: api/Sessions
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<SessionResponse>> PostSessionAsync(Session input)
+        [HttpPost("players/{playerId}")]
+        public async Task<ActionResult<SessionResponse>> PostSessionAsync(Session input, int playerId)
         {
             var session = new Session
             {
                 Title = input.Title,
                 StartTime = input.StartTime,
                 EndTime = input.StartTime,
-                GameId = input.GameId
+                GameId = input.GameId,
             };
+
+            var player = await _context.Players.SingleOrDefaultAsync(p => p.Id == playerId);
+
+            session.SessionPlayers = new List<SessionPlayer>
+            {
+                new SessionPlayer
+                {
+                    Session = session,
+                    Player = player
+                }
+            };
+
+
 
             _context.Sessions.Add(session);
             await _context.SaveChangesAsync();

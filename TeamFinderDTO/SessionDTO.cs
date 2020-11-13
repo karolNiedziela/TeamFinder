@@ -19,6 +19,6 @@ namespace TeamFinderDTO
 
         public TimeSpan Duration => EndTime?.Subtract(StartTime ?? DateTimeOffset.MinValue) ?? TimeSpan.Zero;
 
-        public int? GameId { get; set; }
+        public int GameId { get; set; }
     }
 }

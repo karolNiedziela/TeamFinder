@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FrontEnd.Data
 {
-    public class TeamFinderIdentityDB : IdentityDbContext<User>
+    public class TeamFinderIdentityDB : IdentityDbContext<User, IdentityRole<int>, int>
     {
         public TeamFinderIdentityDB(DbContextOptions<TeamFinderIdentityDB> options)
             : base(options)
