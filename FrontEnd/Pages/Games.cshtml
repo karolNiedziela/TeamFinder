@@ -1,0 +1,39 @@
+﻿@page
+@model FrontEnd.Pages.GamesModel
+@{
+}
+
+<table class="table table-borderless table-striped">
+    <thead>
+        <tr class="text-center">
+            <th>Name</th>
+            <th>Publisher</th>
+            <th authorization="true">Add or undo to your favorite</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var game in Model.Games)
+        {
+            <tr>
+                <td>@game.Name</td>
+                <td>@game.Publisher</td>
+                <td authorization="true" class="text-center">
+                    <form method="post">
+                        @if (await Model.CheckIfInProfile(game.Id))
+                        {
+                            <button class="btn"  type="submit" asp-page="Games" asp-route-gameId="@game.Id">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn" type="submit" asp-page="Games" asp-page-handler="Delete" asp-route-gameId="@game.Id">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        }
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

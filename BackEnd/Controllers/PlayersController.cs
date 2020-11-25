@@ -69,31 +69,31 @@ namespace BackEnd.Controllers
             return player.MapPlayerResponse();
         }
 
-        [HttpGet("{id}/games")]
-        public async Task<ActionResult<List<PlayerResponse>>> GetGamesAsync(int id)
+        [HttpGet("{username}/games")]
+        public async Task<ActionResult<List<PlayerResponse>>> GetGamesAsync(string username)
         {
             var games = await _context.Players.Include(p => p.PlayerGames)
                                                 .ThenInclude(pg => pg.Game)
-                                              .Where(p => p.Id == id)
+                                              .Where(p => p.UserName == username)
                                               .Select(p => p.MapPlayerResponse())
                                               .ToListAsync();
 
             return games;
         }
 
-        [HttpGet("{id}/sessions")]
-        public async Task<ActionResult<List<SessionResponse>>> GetSessionsAsync(int id)
+        [HttpGet("{username}/sessions")]
+        public async Task<ActionResult<List<SessionResponse>>> GetSessionsAsync(string username)
         {
             var sessions = await _context.Sessions.Include(s => s.SessionPlayers)
                                                     .ThenInclude(sp => sp.Player)
                                                   .Include(s => s.Game)
-                                                  .Where(s => s.SessionPlayers.Any(sp => sp.Player.Id == id))
+                                                  .Where(s => s.SessionPlayers.Any(sp => sp.Player.UserName == username))
                                                   .Select(s => s.MapSessionResponse())
                                                   .ToListAsync();
             return sessions;
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{username}")]
         public async Task<IActionResult> PutPlayer(int id, Player player)
         {
             if (id != player.Id)
@@ -148,12 +148,12 @@ namespace BackEnd.Controllers
           
         }
 
-        [HttpPost("{id}/sessions/{sessionId}")]
-        public async Task<ActionResult<PlayerResponse>> AddSessionAsync(int id, int sessionId)
+        [HttpPost("{username}/sessions/{sessionId}")]
+        public async Task<ActionResult<PlayerResponse>> AddSessionAsync(string username, int sessionId)
         {
             var player = await _context.Players.Include(p => p.SessionPlayers)
                                                     .ThenInclude(sp => sp.Session)
-                                               .SingleOrDefaultAsync(p => p.Id == id);
+                                               .SingleOrDefaultAsync(p => p.UserName == username);
 
             if (player == null)
             {
@@ -180,12 +180,12 @@ namespace BackEnd.Controllers
             return result;
         }
 
-        [HttpPost("{id}/games/{gameId}")]
-        public async Task<ActionResult<PlayerResponse>> AddGameAsync(int id, int gameId)
+        [HttpPost("{username}/games/{gameId}")]
+        public async Task<ActionResult<PlayerResponse>> AddGameAsync(string username, int gameId)
         {
             var player = await _context.Players.Include(p => p.PlayerGames)
                                                     .ThenInclude(pg => pg.Game)
-                                               .SingleOrDefaultAsync(p => p.Id == id);
+                                               .SingleOrDefaultAsync(p => p.UserName == username);
 
             if (player == null)
             {
@@ -199,6 +199,12 @@ namespace BackEnd.Controllers
                 return BadRequest();
             }
 
+            player.PlayerGames.Add(new PlayerGame
+            {
+                PlayerId = player.Id,
+                GameId = game.Id
+            });
+
             await _context.SaveChangesAsync();
 
             var result = player.MapPlayerResponse();
@@ -206,11 +212,11 @@ namespace BackEnd.Controllers
             return result;
         }
 
-        [HttpDelete("{id}/sessions/{sessionId}")]
-        public async Task<IActionResult> RemoveSessionAsync(int id, int sessionId)
+        [HttpDelete("{username}/sessions/{sessionId}")]
+        public async Task<IActionResult> RemoveSessionAsync(string username, int sessionId)
         {
             var player = await _context.Players.Include(p => p.SessionPlayers)
-                                               .SingleOrDefaultAsync(p => p.Id == id);
+                                               .SingleOrDefaultAsync(p => p.UserName == username);
 
             if (player == null)
             {
@@ -232,7 +238,7 @@ namespace BackEnd.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}/games/{gameId}")]
+        [HttpDelete("{username}/games/{gameId}")]
         public async Task<IActionResult> RemoveGameAsync(string username, int gameId)
         {
             var player = await _context.Players.Include(p => p.PlayerGames)

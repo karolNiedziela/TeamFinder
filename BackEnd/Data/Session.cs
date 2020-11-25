@@ -12,6 +12,5 @@ namespace BackEnd.Data
         public ICollection<SessionPlayer> SessionPlayers { get; set; }
 
         public Game Game { get; set; }
-        
     }
 }

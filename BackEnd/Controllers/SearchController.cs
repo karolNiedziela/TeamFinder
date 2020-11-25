@@ -30,8 +30,9 @@ namespace BackEnd.Controllers
                                                             .ThenInclude(sp => sp.Player)
                                                         .Include(s => s.Game)
                                                         .Where(s =>
-                                                            s.Title.Contains(query) ||
-                                                            s.Game.Name.Contains(query)
+                                                            (s.Title.Contains(query) ||
+                                                            s.Game.Name.Contains(query)) &&
+                                                            s.StartTime >= DateTime.Today                                                      
                                                         )
                                                         .ToListAsync();
 

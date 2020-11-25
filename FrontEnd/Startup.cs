@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FrontEnd.Hubs;
 using FrontEnd.Middleware;
 using FrontEnd.Services;
 using Microsoft.AspNetCore.Builder;
@@ -10,6 +11,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Identity.UI.Services;
+
 
 namespace FrontEnd
 {
@@ -30,6 +33,7 @@ namespace FrontEnd
                 options.Conventions.AuthorizeFolder("/Admin", "Admin");
             }).AddRazorRuntimeCompilation();
 
+            services.AddSignalR();
 
             services.AddHttpClient<IApiClient, ApiClient>(client =>
             {
@@ -46,6 +50,9 @@ namespace FrontEnd
                           .RequireIsAdminClaim();
                 });
             });
+
+            services.AddTransient<Services.IEmailSender, EmailSender>();
+            services.Configure<AuthMessageSenderOptions>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -75,6 +82,7 @@ namespace FrontEnd
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapHub<ChatHub>("/chathub");
             });
         }
     }

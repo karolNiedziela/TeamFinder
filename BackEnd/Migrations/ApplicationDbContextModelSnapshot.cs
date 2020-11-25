@@ -92,10 +92,14 @@ namespace BackEnd.Migrations
                     b.Property<DateTimeOffset?>("EndTime")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<int?>("GameId")
+                    b.Property<int>("GameId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MembersLimit")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("StartTime")
+                        .IsRequired()
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Title")
@@ -117,6 +121,9 @@ namespace BackEnd.Migrations
 
                     b.Property<int>("SessionId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsOwner")
+                        .HasColumnType("bit");
 
                     b.HasKey("PlayerId", "SessionId");
 
@@ -144,7 +151,9 @@ namespace BackEnd.Migrations
                 {
                     b.HasOne("BackEnd.Data.Game", "Game")
                         .WithMany()
-                        .HasForeignKey("GameId");
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("BackEnd.Data.SessionPlayer", b =>

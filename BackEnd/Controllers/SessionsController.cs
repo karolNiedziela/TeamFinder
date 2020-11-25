@@ -85,33 +85,29 @@ namespace BackEnd.Controllers
             return NoContent();
         }
 
-        // POST: api/Sessions
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost("players/{playerId}")]
-        public async Task<ActionResult<SessionResponse>> PostSessionAsync(Session input, int playerId)
+        [HttpPost("players/{username}")]
+        public async Task<ActionResult<SessionResponse>> PostSessionAsync(Session input, string username)
         {
             var session = new Session
             {
                 Title = input.Title,
                 StartTime = input.StartTime,
                 EndTime = input.StartTime,
+                MembersLimit = input.MembersLimit,
                 GameId = input.GameId,
             };
 
-            var player = await _context.Players.SingleOrDefaultAsync(p => p.Id == playerId);
+            var player = await _context.Players.SingleOrDefaultAsync(p => p.UserName == username);
 
             session.SessionPlayers = new List<SessionPlayer>
             {
                 new SessionPlayer
                 {
                     Session = session,
-                    Player = player
+                    Player = player,
+                    IsOwner = true             
                 }
             };
-
-
-
             _context.Sessions.Add(session);
             await _context.SaveChangesAsync();
 

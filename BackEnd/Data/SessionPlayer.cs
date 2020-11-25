@@ -14,5 +14,7 @@ namespace BackEnd.Data
         public Session Session { get; set; }
 
         public int SessionId { get; set; }
+
+        public bool IsOwner { get; set; }
     }
 }

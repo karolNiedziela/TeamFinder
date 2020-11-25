@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using FrontEnd.Extensions;
 using FrontEnd.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -23,11 +23,21 @@ namespace FrontEnd.Pages
 
         public DayOfWeek? DayOfWeek { get; set; }
 
+        public PlayerDTO Owner { get; set; }
+
         public bool IsInProfile { get; set; }
+        
+        public bool IsOwner { get; set; }
 
         public async Task<IActionResult> OnGet(int id)
         {
             Session = await _apiClient.GetSessionAsync(id);
+
+            if (Session.Players.Count == 0)
+            {
+                await _apiClient.DeleteSessionAsync(Session.Id);
+                return RedirectToPage("/Index");
+            }
 
             if (Session == null)
             {
@@ -36,14 +46,14 @@ namespace FrontEnd.Pages
 
             if (User.Identity.IsAuthenticated)
             {
-                var sessions = await _apiClient.GetSessionsByPlayerAsync(User.Identity.GetPlayerId());
+                var sessions = await _apiClient.GetSessionsByPlayerAsync(User.Identity.Name);
 
                 IsInProfile = sessions.Any(s => s.Id == id);
             }
 
-            var allSessions = await _apiClient.GetSessionsAsync();
+            Owner = Session.Owner;
 
-            var startDate = allSessions.Min(s => s.StartTime?.Date);
+            IsOwner = User.IsOwner(id);
 
             DayOfWeek = Session.StartTime?.DayOfWeek;
 
@@ -52,16 +62,30 @@ namespace FrontEnd.Pages
 
         public async Task<IActionResult> OnPostAsync(int sessionId)
         {
-            await _apiClient.AddSessionToPlayerAsync(User.Identity.GetPlayerId(), sessionId);
+            await _apiClient.AddSessionToPlayerAsync(User.Identity.Name, sessionId);
 
             return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostDeleteAsync(int sessionId)
         {
-            await _apiClient.RemoveSessionFromPlayerAsync(User.Identity.GetPlayerId(), sessionId);
+            if (User.IsOwner(sessionId))
+            {
+                await _apiClient.DeleteSessionAsync(sessionId);
+                return RedirectToPage("/Index");
+            }
+
+            await _apiClient.RemoveSessionFromPlayerAsync(User.Identity.Name, sessionId);
 
             return RedirectToPage();
         }
+
+        public async Task<IActionResult> OnPostKickAsync(string username, int sessionId)
+        {
+            await _apiClient.RemoveSessionFromPlayerAsync(username, sessionId);
+
+            return RedirectToPage();
+        }
+
     }
 }

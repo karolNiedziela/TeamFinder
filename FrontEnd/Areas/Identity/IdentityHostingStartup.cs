@@ -19,7 +19,13 @@ namespace FrontEnd.Areas.Identity
                     options.UseSqlServer(
                         context.Configuration.GetConnectionString("TeamFinderIdentityDBConnection")));
 
-                services.AddDefaultIdentity<User>()
+                services.AddDefaultIdentity<User>(options => {
+                    options.Password.RequireDigit = true;
+                    options.Password.RequiredLength = 6;
+                    options.Password.RequireUppercase = true;
+                    options.User.RequireUniqueEmail = true;
+                    options.SignIn.RequireConfirmedAccount = true;
+                })
                     .AddEntityFrameworkStores<TeamFinderIdentityDB>()
                     .AddClaimsPrincipalFactory<ClaimsPrincipalFactory>();
             });

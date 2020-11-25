@@ -10,11 +10,31 @@
 <h1>@Model.Session.Title</h1>
 <h2 class="label label-default">Game - @Model.Session.Game.Name</h2>
 
+<div class="row col-6">
+    <div class="col"><h4>Owner of the room:</h4> </div>
+    <div class="col"> <a asp-page="Player" asp-route-id="@Model.Owner.Id"><h4>@Model.Owner.UserName</h4></a></div>
+</div>
+
 <h4>Player(s):</h4>
 @foreach (var player in Model.Session.Players)
 {
-    <a asp-page="Player" asp-route-id="@player.Id">@player.UserName</a>
-    <em> @player.Age</em> <br />
+    @if (player.Id != Model.Owner.Id)
+    {
+        <div class="row col-md-4">
+            <div class="col">
+                <a asp-page="Player" asp-route-id="@player.Id">@player.UserName</a>
+            </div>
+            <div class="col">
+                @player.Age
+            </div>
+            @if (Model.IsOwner)
+            {
+                <div class="col">
+                    <form method="post"><button type="submit" asp-page-handler="Kick" asp-route-username="@player.UserName" asp-route-sessionId="@Model.Session.Id">Kick</button></form>
+                </div>
+            }
+        </div>
+    }
 }
 
 <form method="post">
@@ -30,8 +50,37 @@
         else
         {
             <button authorization="true" type="submit" class="btn btn-default btn-sm">
-               <i class="fas fa-plus" aria-hidden="true"> Join to the session</i>
+                <i class="fas fa-plus" aria-hidden="true"> Join to the session</i>
             </button>
         }
     </p>
 </form>
+
+<div class="container">
+    <div class="row">&nbsp;</div>
+        <div class="col-4"><input type="hidden" id="userInput" value="@User.Identity.Name"/></div>
+        <div class="col-4"><input type="hidden" id="dateInput" value="@DateTime.Now.ToString("HH:mm")" /></div>
+    <div class="row">
+        <div class="col-2">Message</div>
+        <div class="col-4"><input type="text" id="messageInput" /></div>
+    </div>
+    <div class="row">&nbsp;</div>
+    <div class="row">
+        <div class="col-6">
+            <input type="button" id="sendButton" value="Send Message" />
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <hr />
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <ul id="messagesList"></ul>
+    </div>
+</div>
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js"></script>

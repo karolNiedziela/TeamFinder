@@ -14,15 +14,11 @@ namespace FrontEnd.Areas.Identity.Pages.Account.Manage
 
         public static string ChangePassword => "ChangePassword";
 
-        public static string DownloadPersonalData => "DownloadPersonalData";
-
-        public static string DeletePersonalData => "DeletePersonalData";
-
         public static string ExternalLogins => "ExternalLogins";
 
-        public static string TwoFactorAuthentication => "TwoFactorAuthentication";
-
         public static string Player => "Player";
+
+        public static string Games => "Games";
 
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
 
@@ -30,16 +26,11 @@ namespace FrontEnd.Areas.Identity.Pages.Account.Manage
 
         public static string ChangePasswordNavClass(ViewContext viewContext) => PageNavClass(viewContext, ChangePassword);
 
-        public static string DownloadPersonalDataNavClass(ViewContext viewContext) => PageNavClass(viewContext, DownloadPersonalData);
-
-        public static string DeletePersonalDataNavClass(ViewContext viewContext) => PageNavClass(viewContext, DeletePersonalData);
-
         public static string ExternalLoginsNavClass(ViewContext viewContext) => PageNavClass(viewContext, ExternalLogins);
 
-
-        public static string TwoFactorAuthenticationNavClass(ViewContext viewContext) => PageNavClass(viewContext, TwoFactorAuthentication);
-
         public static string PlayerNavClass(ViewContext viewContext) => PageNavClass(viewContext, Player);
+
+        public static string GamesNavClass(ViewContext viewContext) => PageNavClass(viewContext, Games);
 
         private static string PageNavClass(ViewContext viewContext, string page)
         {

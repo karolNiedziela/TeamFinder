@@ -10,5 +10,7 @@ namespace TeamFinderDTO
         public GameDTO Game { get; set; }
 
         public List<PlayerDTO> Players { get; set; }
+
+        public PlayerDTO Owner { get; set; }
     }
 }

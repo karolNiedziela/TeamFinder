@@ -1,0 +1,53 @@
+﻿@page
+@model FrontEnd.Pages.CreateSessionModel
+@{
+}
+<h1>It works</h1>
+
+<form method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <label class="control-label" asp-for="Session.Title"></label>
+        <div class="row">
+            <div class="col-md-6">
+                <input asp-for="Session.Title" class="form-control" />
+            </div>
+        </div>
+        <span asp-validation-for="Session.Title" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label class="control-label" asp-for="Session.StartTime"></label>
+        <div class="row">
+            <div class="col-md-6">
+                <input type="datetime-local" asp-for="Session.StartTime" class="form-control" min="@DateTime.Now" max="@DateTime.Now.AddDays(7)" />
+            </div>
+        </div>
+        <span asp-validation-for="Session.StartTime" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label class="control-label" asp-for="Session.MembersLimit"></label>
+        <div class="row">
+            <div class="col-md-6">
+                <input asp-for="Session.MembersLimit" class="form-control" />
+            </div>
+        </div>
+        <span asp-validation-for="Session.MembersLimit" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label class="control-label" asp-for="Session.GameId"></label>
+        <div class="row">
+            <div class="col-md-6">
+                <select class="form-control" asp-for="Session.GameId" asp-items="@Model.GamesSelectList">
+                    <option value="">-- Select Game -- </option>
+                </select>
+            </div>
+        </div>
+        <span asp-validation-for="Session.GameId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-16">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+
+</form>

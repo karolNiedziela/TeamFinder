@@ -1,0 +1,18 @@
+﻿@page
+@model FrontEnd.Areas.Identity.Pages.Account.GamesModel
+
+@foreach (var game in Model.Games)
+{
+    <div class="row">
+        <div class="col">
+            @game.Name
+        </div>
+        <div class="col">
+            <form method="post">
+                <button class="btn" asp-page="Games" asp-page-handler="Delete" asp-route-gameId="@game.Id">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+}

@@ -5,6 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20201121101548_MembersLimit.cs" />
+    <Compile Remove="Migrations\20201121101548_MembersLimit.Designer.cs" />
+    <Compile Remove="Migrations\20201121102607_MembersLimit.cs" />
+    <Compile Remove="Migrations\20201121102607_MembersLimit.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
     <PackageReference Include="CsvHelper" Version="15.0.9" />

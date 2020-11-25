@@ -16,6 +16,7 @@ namespace BackEnd.Infrastructure
                 Title = session.Title,
                 StartTime = session.StartTime?.LocalDateTime,
                 EndTime = session.EndTime?.LocalDateTime,
+                MembersLimit = session.MembersLimit,
                 Players = session.SessionPlayers?
                                   .Select(sp => new PlayerDTO
                                   {
@@ -25,6 +26,15 @@ namespace BackEnd.Infrastructure
                                       Info = sp.Player.Info
                                   })
                                   .ToList(),
+                Owner = session.SessionPlayers?
+                               .Where(sp => sp.IsOwner == true)
+                               .Select(sp => new PlayerDTO
+                               {
+                                   Id = sp.PlayerId,
+                                   UserName = sp.Player.UserName
+                               })
+                               .FirstOrDefault(),                              
+/*                OwnerId = session.SessionPlayers.Where(sp => sp.IsOwner == true).Select(sp => sp.PlayerId).FirstOrDefault(),    */            
                 GameId = session.GameId,
                 Game = new GameDTO
                 {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using FrontEnd.Extensions;
 using FrontEnd.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -23,13 +22,13 @@ namespace FrontEnd.Pages
 
         public IEnumerable<IGrouping<string, SessionResponse>> Sessions { get; set; }
 
-        public GameDTO Game { get; set; }
-
-        public IEnumerable<(int Offset, DateTime? Date)> DayOffsets { get; set; }
+        public List<(int Offset, DateTime? Date)> DayOffsets { get; set; }
 
         public List<PlayerDTO> Owner { get; set; }
 
         public int CurrentDayOffset { get; set; }
+
+        public int CurrentNumberOfPlayers { get; set; }
 
         public bool IsAdmin { get; set; }
 
@@ -40,41 +39,30 @@ namespace FrontEnd.Pages
 
         public List<int> UserSessions { get; set; } = new List<int>();
 
-
-        public async Task OnGet(int day = 0)
+        public async Task OnGet(string date = "")
         {
             IsAdmin = User.IsAdmin();
+            DateTime dateTime = new DateTime();
 
-            CurrentDayOffset = day;
+            dateTime = ConvertToDateTime(dateTime, date);
+
+            CurrentDayOffset = (dateTime.Date - DateTime.Today.Date).Days;
 
             if (User.Identity.IsAuthenticated)
             {
-                var userSessions = await _apiClient.GetSessionsByPlayerAsync(User.Identity.GetPlayerId());
+                var userSessions = await _apiClient.GetSessionsByPlayerAsync(User.Identity.Name);
                 UserSessions = userSessions.Select(us => us.Id).ToList();
             }
 
-
             var sessions = await GetSessionsAsync();
 
-            var startDate = DateTime.Today.Date;
+            DayOffsets = CreateSevenDaysOffset();
+            
+            var filterDate = DateTime.Today.AddDays(CurrentDayOffset);
 
-            var offset = 0;
-            DayOffsets = sessions.Select(s => s.StartTime?.Date)
-                                 .Distinct()
-                                 .Where(s => s.Value >= DateTime.Today)
-                                 .OrderBy(d => d)
-                                 .Select(day => (offset++, day?.Date));
-
-            var filterDate = startDate.AddDays(CurrentDayOffset);
-
-            Sessions = sessions.Where(s => s.StartTime?.Date == filterDate)
+            Sessions = sessions.Where(s => s.StartTime?.Date == filterDate)                         
                                .GroupBy(s => s.Game.Name)
                                .OrderBy(g => g.Key);
-
-            Owner = sessions.Select(s => s?.Players).FirstOrDefault();
-
-            var gameId = sessions.Select(s => s.Game.Id);
-            Game = await _apiClient.GetGameAsync(gameId.FirstOrDefault());
         }
 
         protected virtual Task<List<SessionResponse>> GetSessionsAsync()
@@ -84,16 +72,44 @@ namespace FrontEnd.Pages
 
         public async Task<IActionResult> OnPostAsync(int sessionId)
         {
-            await _apiClient.AddSessionToPlayerAsync(User.Identity.GetPlayerId(), sessionId);
+            await _apiClient.AddSessionToPlayerAsync(User.Identity.Name, sessionId);
 
             return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostDeleteAsync(int sessionId)
         {
-            await _apiClient.RemoveSessionFromPlayerAsync(User.Identity.GetPlayerId(), sessionId);
+            await _apiClient.RemoveSessionFromPlayerAsync(User.Identity.Name, sessionId);
 
             return RedirectToPage();
+        }
+
+        private DateTime ConvertToDateTime(DateTime dateTime, string date)
+        {
+
+            if (String.IsNullOrEmpty(date))
+            {
+                dateTime = DateTime.Today.Date;
+
+            }
+            else
+            {
+                dateTime = Convert.ToDateTime(date);
+            }
+
+            return dateTime;
+        }
+
+        private List<(int, DateTime?)>  CreateSevenDaysOffset()
+        {
+            var DayOffsets = new List<(int, DateTime?)>();
+
+            for (var i = 0; i < 7; i++)
+            {
+                DayOffsets.Add((i, DateTime.Today.AddDays(i)));
+            }
+
+            return DayOffsets;
         }
     }
 }

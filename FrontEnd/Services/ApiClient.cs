@@ -70,9 +70,9 @@ namespace FrontEnd.Services
         }
 
 
-        public async Task<List<PlayerResponse>> GetPlayerGamesAsync(int id)
+        public async Task<List<PlayerResponse>> GetPlayerGamesAsync(string username)
         {
-            var response = await _httpClient.GetAsync($"/api/players/{id}/games");
+            var response = await _httpClient.GetAsync($"/api/players/{username}/games");
 
             response.EnsureSuccessStatusCode();
 
@@ -126,9 +126,9 @@ namespace FrontEnd.Services
             return await response.Content.ReadAsAsync<List<SearchResult>>();
         }
 
-        public async Task<SessionResponse> PostSession(SessionDTO session)
+        public async Task<SessionResponse> PostSession(SessionDTO session, string username)
         {
-            var response = await _httpClient.PostAsJsonAsync($"/api/sessions", session);
+            var response = await _httpClient.PostAsJsonAsync($"/api/sessions/players/{username}", session);
 
             response.EnsureSuccessStatusCode();
 
@@ -176,25 +176,39 @@ namespace FrontEnd.Services
             response.EnsureSuccessStatusCode();
         }
 
-        public async Task<List<SessionResponse>> GetSessionsByPlayerAsync(int playerId)
+        public async Task<List<SessionResponse>> GetSessionsByPlayerAsync(string username)
         {
-            var response = await _httpClient.GetAsync($"/api/players/{playerId}/sessions");
+            var response = await _httpClient.GetAsync($"/api/players/{username}/sessions");
 
             response.EnsureSuccessStatusCode();
 
             return await response.Content.ReadAsAsync<List<SessionResponse>>();
         }
 
-        public async Task AddSessionToPlayerAsync(int playerId, int sessionId)
+        public async Task AddSessionToPlayerAsync(string username, int sessionId)
         {
-            var response = await _httpClient.PostAsync($"/api/players/{playerId}/sessions/{sessionId}", null);
+            var response = await _httpClient.PostAsync($"/api/players/{username}/sessions/{sessionId}", null);
 
             response.EnsureSuccessStatusCode();
         }
 
-        public async Task RemoveSessionFromPlayerAsync(int playerId, int sessionId)
+        public async Task RemoveSessionFromPlayerAsync(string username, int sessionId)
         {
-            var response = await _httpClient.DeleteAsync($"/api/players/{playerId}/sessions/{sessionId}");
+            var response = await _httpClient.DeleteAsync($"/api/players/{username}/sessions/{sessionId}");
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task AddGameToPlayerAsync(string username, int gameId)
+        {
+            var response = await _httpClient.PostAsync($"/api/players/{username}/games/{gameId}", null);
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task RemoveGameFromPlayerAsync(string username, int gameId)
+        {
+            var response = await _httpClient.DeleteAsync($"/api/players/{username}/games/{gameId}");
 
             response.EnsureSuccessStatusCode();
         }

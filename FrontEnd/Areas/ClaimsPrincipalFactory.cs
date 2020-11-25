@@ -1,5 +1,6 @@
 ﻿using FrontEnd.Data;
 using FrontEnd.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System;
@@ -13,11 +14,14 @@ namespace FrontEnd.Areas
     public class ClaimsPrincipalFactory : UserClaimsPrincipalFactory<User>
     {
         private readonly IApiClient _apiClient;
+        private readonly IHttpContextAccessor _accessor;
 
-        public ClaimsPrincipalFactory(UserManager<User> userManager, IOptions<IdentityOptions> optionsAccessor, IApiClient apiClient) 
+        public ClaimsPrincipalFactory(UserManager<User> userManager, IOptions<IdentityOptions> optionsAccessor, IApiClient apiClient,
+            IHttpContextAccessor accessor) 
             : base(userManager, optionsAccessor)
         {
             _apiClient = apiClient;
+            _accessor = accessor;
         }
 
         protected async override Task<ClaimsIdentity> GenerateClaimsAsync(User user)
@@ -30,11 +34,21 @@ namespace FrontEnd.Areas
             }
 
             var player = await _apiClient.GetPlayerAsync(user.UserName);
-
             if (player != null)
             {
                 identity.MakePlayer();
-                identity.AddClaim(new Claim("PlayerId", $"{player.Id}"));
+            }
+
+            var playerSessions = await _apiClient.GetSessionsByPlayerAsync(user.UserName);
+            if (player != null)
+            {
+                var playerIsOwner = playerSessions.Where(ps => ps.Owner.Id == player.Id);
+
+                foreach (var session in playerIsOwner)
+                {
+                    var sessionId = session.Id;
+                    identity.MakeOwner(sessionId);
+                }
             }
 
             return identity;

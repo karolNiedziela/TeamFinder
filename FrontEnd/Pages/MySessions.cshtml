@@ -14,3 +14,33 @@
 }
 
 <partial name="_MySessionsPartial" model="Model" />
+
+<div class="agenda">
+    @foreach (var timeSlot in Model.Sessions)
+    {
+        <h4>@timeSlot.Key</h4>
+        <div class="row">
+            @foreach (var session in timeSlot)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow session h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a asp-page="Session" asp-route-id="@session.Id">@session.Title</a>
+                            </h5>
+                        </div>
+                        <div class="card-footer">
+
+                            <ul class="list-inline mb-0">
+
+                                <li class="list-inline-item"><span class="badge text-left"><i class="fas fa-crown fa-2x"></i></span><a asp-page="Player" asp-route-id="@session?.Owner.Id"> @session?.Owner.UserName</a></li>
+                                <li class="list-inline-item">Players: @session.Players.Count() out of @session.MembersLimit</li>
+                            </ul>
+                            <a authorization-policy="Admin" asp-page="/Admin/EditSession" asp-route-id="@session.Id" class="btn btn-default btn-xs">Edit</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

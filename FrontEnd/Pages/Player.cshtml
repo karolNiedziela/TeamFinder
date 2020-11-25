@@ -2,22 +2,20 @@
 @model FrontEnd.PlayerModel
 
 <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a asp-page="/Players">Players</a></li>
-    <li class="breadcrumb-item active">@Model.Player.UserName</li>
+    <li class="breadcrumb-item">Players</li>
+    <li class="breadcrumb-item active"><a asp-page="Players" asp-route-username="@Model.Player.UserName"> @Model.Player.UserName </a></li>
 </ol>
 
 <h2>@Model.Player.UserName</h2>
 
 <p>@Model.Player.Info</p>
 
-<h3>Games</h3>
+<h3>Games: </h3>
 <div class="row">
-    <div class="col-md-5">
-        <ul class="list-group">
+    <div class="col-md-4">
             @foreach (var game in Model.Player.Games)
             {
-                <li class="list-group-item"><a asp-page="Game" asp-route-id="game.Id">@game.Name</a></li>
+                <div class="row col-md-8">@game.Name</div>
             }
-        </ul>
     </div>
 </div>

@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using FrontEnd.Data;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
@@ -87,14 +86,14 @@ namespace FrontEnd.Areas.Identity.Pages.Account
             {
                 var user = new User { UserName = Input.UserName, Email = Input.Email };
 
-                if(await _adminService.AllowAdminUserCreationAsync())
+                if (await _adminService.AllowAdminUserCreationAsync())
                 {
                     user.IsAdmin = true;
                 }
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
-                {
+                {      
                     if (user.IsAdmin)
                     {
                         _logger.LogInformation("Admin user created a new account with password.");
